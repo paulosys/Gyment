@@ -69,12 +69,11 @@ fun HomeScreen() {
         )
     )
 
-
     Scaffold(
         topBar = {
             TopAppBar(
                 modifier = Modifier
-                    .height(132.dp)
+                    //.height(140.dp)
                     .padding(top = 32.dp),
                 title = {
                     Row(
@@ -119,7 +118,7 @@ fun HomeScreen() {
                 },
             )
 
-        }
+        },
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             MuscleFilter()
