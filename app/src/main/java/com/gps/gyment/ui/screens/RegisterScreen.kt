@@ -1,5 +1,6 @@
 package com.gps.gyment.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,17 +34,24 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.gps.gyment.ui.components.Logo
 import com.gps.gyment.ui.theme.GymentTheme
 
 @Composable
-fun RegisterScreen(modifier: Modifier = Modifier) {
+fun RegisterScreen(navController: NavController) {
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
         Column(
-            modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
                 .imePadding(),
@@ -51,16 +59,50 @@ fun RegisterScreen(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.SpaceAround,
         ) {
             Logo()
-            Form()
-            BackToLoginButton()
+            Form(
+                name = name,
+                onNameChange = { name = it },
+                email = email,
+                onEmailChange = { email = it },
+                password = password,
+                onPasswordChange = { password = it },
+                confirmPassword = confirmPassword,
+                onConfirmPasswordChange = { confirmPassword = it },
+                onRegisterClick = {
+                    if (password == confirmPassword) {
+                        registerUser(name, email, password, navController)
+                    } else {
+                        // Exibir mensagem de erro
+                    }
+                }
+            )
+            BackToLoginButton{ navController.popBackStack() }
         }
     }
 }
 
+private fun registerUser(name: String, email: String, password: String, navController: NavController) {
+    val auth = FirebaseAuth.getInstance()
+    auth.createUserWithEmailAndPassword(email, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val user = auth.currentUser
+                if (user != null) {
+                    Log.d("AuthStatus", "Usuário autenticado:")
+                } else {
+                    // O usuário não está autenticado
+                }
+                navController.popBackStack() // Voltar para a tela de login
+            } else {
+                // Exibir mensagem de erro
+            }
+        }
+}
+
 @Composable
-fun BackToLoginButton() {
+fun BackToLoginButton(onBackToLogin: () -> Unit) {
     Button(
-        onClick = {},
+        onClick = onBackToLogin,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
         modifier = Modifier.fillMaxWidth()
@@ -74,12 +116,17 @@ fun BackToLoginButton() {
 }
 
 @Composable
-fun Form() {
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-
+fun Form(
+    name: String,
+    onNameChange: (String) -> Unit,
+    email: String,
+    onEmailChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    confirmPassword: String,
+    onConfirmPasswordChange: (String) -> Unit,
+    onRegisterClick: () -> Unit
+) {
     val focusManager = LocalFocusManager.current
 
     Column(
@@ -97,9 +144,9 @@ fun Form() {
 
         OutlinedTextField(
             value = name,
+            onValueChange = onNameChange,
             label = { Text("Nome") },
             modifier = Modifier.fillMaxWidth(),
-            onValueChange = { name = it },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(
                 onNext = { focusManager.moveFocus(FocusDirection.Down) }
@@ -109,7 +156,7 @@ fun Form() {
 
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = onEmailChange,
             label = { Text("E-mail") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
@@ -125,7 +172,7 @@ fun Form() {
 
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = onPasswordChange,
             label = { Text("Senha") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
@@ -142,7 +189,7 @@ fun Form() {
 
         OutlinedTextField(
             value = confirmPassword,
-            onValueChange = { confirmPassword = it },
+            onValueChange = onConfirmPasswordChange,
             label = { Text("Confirme sua senha") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
@@ -151,14 +198,14 @@ fun Form() {
                 imeAction = ImeAction.Send
             ),
             keyboardActions = KeyboardActions(
-                onSend = {}
+                onSend = { onRegisterClick() }
             )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = {},
+            onClick = onRegisterClick,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -168,13 +215,5 @@ fun Form() {
                 fontWeight = FontWeight.Bold
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun RegisterScreenPreview() {
-    GymentTheme {
-        RegisterScreen()
     }
 }
