@@ -84,6 +84,7 @@ fun HomeScreen(navController: NavController) {
                 exercises.clear()
                 for (document in querySnapshot) {
                     val exercise = document.toObject(Exercise::class.java)
+                    exercise.id = document.id
                     exercises.add(exercise)
                 }
             }
@@ -170,7 +171,9 @@ fun HomeScreen(navController: NavController) {
                 }
 
                 exercises.forEach { exercise ->
-                    ExerciseCard(exercise = exercise) {}
+                    ExerciseCard(exercise = exercise) {
+                        navController.navigate("exercise_detail/${exercise.id}")
+                    }
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }

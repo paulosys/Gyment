@@ -79,7 +79,7 @@ fun LoginScreen(navController: NavController) {
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
                                         Log.d("AuthStatus", "Usuário autenticado:")
-                                        navController.navigate(Routes.HOME.route)
+                                        navController.navigate("app")
                                     } else{
                                         Log.d("AuthStatus", "Erro ao autenticar usuário:")
                                         error = "E-mail ou senha incorretos"
