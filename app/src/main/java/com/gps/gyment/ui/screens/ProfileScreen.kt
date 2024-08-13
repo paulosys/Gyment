@@ -7,21 +7,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
 import com.gps.gyment.ui.theme.GymentTheme
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(navController: NavController) {
     Scaffold { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             Text(text = "Perfil")
         }
-    }
-}
-
-@Preview
-@Composable
-fun ProfileScreenPreview() {
-    GymentTheme {
-        ProfileScreen()
     }
 }

@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gps.gyment.ui.components.BottomNavBar
+import com.gps.gyment.ui.screens.CreateExerciseScreen
 import com.gps.gyment.ui.screens.HistoryScreen
 import com.gps.gyment.ui.screens.HomeScreen
 import com.gps.gyment.ui.screens.ProfileScreen
@@ -25,9 +26,10 @@ fun GymentApp() {
             startDestination = Routes.HOME.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(route = Routes.HOME.route) { HomeScreen() }
-            composable(route = Routes.HISTORY.route) { HistoryScreen() }
-            composable(route = Routes.PROFILE.route) { ProfileScreen() }
+            composable(route = Routes.HOME.route) { HomeScreen(navController) }
+            composable(route = Routes.HISTORY.route) { HistoryScreen(navController) }
+            composable(route = Routes.PROFILE.route) { ProfileScreen(navController) }
+            composable(route = "create_exercise") { CreateExerciseScreen(navController) }
         }
     }
 }

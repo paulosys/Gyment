@@ -15,8 +15,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +38,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.gps.gyment.R
 import com.gps.gyment.data.models.Exercise
 import com.gps.gyment.ui.components.ExerciseCard
@@ -41,7 +50,26 @@ import com.gps.gyment.ui.theme.GymentTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    var userName by remember { mutableStateOf("") }
+
+    // Se o usuário estiver autenticado, buscar o nome do Firestore
+    if (currentUser != null) {
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(currentUser.uid)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    userName = document.getString("name") ?: "Usuário"
+                }
+            }
+            .addOnFailureListener { e ->
+                e.printStackTrace()
+            }
+    }
+
     val exercises = listOf(
         Exercise(
             id = 1,
@@ -70,6 +98,11 @@ fun HomeScreen() {
     )
 
     Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = { navController.navigate("create_exercise") }) {
+                Icon(Icons.Filled.Add, contentDescription = "Notifications")
+            }
+        },
         topBar = {
             TopAppBar(
                 modifier = Modifier
@@ -96,7 +129,7 @@ fun HomeScreen() {
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                             Text(
-                                text = "Paulo Sérgio",
+                                text = userName,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -146,12 +179,4 @@ fun HomeScreen() {
         }
     }
 
-}
-
-@Preview
-@Composable
-fun HomeScreenPreview() {
-    GymentTheme {
-        HomeScreen()
-    }
 }

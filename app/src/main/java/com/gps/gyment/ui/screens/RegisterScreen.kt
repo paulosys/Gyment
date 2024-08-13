@@ -39,6 +39,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.gps.gyment.Routes
 import com.gps.gyment.ui.components.Logo
 import com.gps.gyment.ui.theme.GymentTheme
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -82,6 +83,10 @@ fun RegisterScreen(navController: NavController) {
     }
 }
 
+
+
+
+
 private fun registerUser(name: String, email: String, password: String, navController: NavController) {
     val auth = FirebaseAuth.getInstance()
     auth.createUserWithEmailAndPassword(email, password)
@@ -89,11 +94,33 @@ private fun registerUser(name: String, email: String, password: String, navContr
             if (task.isSuccessful) {
                 val user = auth.currentUser
                 if (user != null) {
-                    navController.navigate("app")
+                    // Cria um documento na coleção "users" para o usuário atual
+                    val userData = hashMapOf(
+                        "name" to name,
+                        "email" to email,
+                        "createdAt" to System.currentTimeMillis()
+                    )
+
+                    FirebaseFirestore.getInstance()
+                        .collection("users")
+                        .document(user.uid) // Usa o UID do usuário como ID do documento
+                        .set(userData)
+                        .addOnSuccessListener {
+                            // Documento criado com sucesso, navegar para a próxima tela
+                            navController.navigate("app")
+                        }
+                        .addOnFailureListener { e ->
+                            // Falha ao criar o documento, lidar com o erro
+                            e.printStackTrace()
+                        }
                 }
+            } else {
+                // Lidar com falha na criação do usuário
+                task.exception?.printStackTrace()
             }
         }
 }
+
 
 @Composable
 fun BackToLoginButton(onBackToLogin: () -> Unit) {
