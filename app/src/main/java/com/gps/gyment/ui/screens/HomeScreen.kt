@@ -56,7 +56,7 @@ import com.gps.gyment.ui.theme.GymentTheme
 fun HomeScreen(navController: NavController) {
     val currentUser = FirebaseAuth.getInstance().currentUser
     var userName by remember { mutableStateOf("") }
-    var selectedMuscle by remember { mutableStateOf(Muscle.CHEST) }
+    var selectedMuscle by remember { mutableStateOf<Muscle?>(null) }
     val exercises = remember { mutableStateListOf<Exercise>() }
 
     // Se o usuário estiver autenticado, buscar o nome do Firestore
@@ -85,7 +85,10 @@ fun HomeScreen(navController: NavController) {
                 for (document in querySnapshot) {
                     val exercise = document.toObject(Exercise::class.java)
                     exercise.id = document.id
-                    exercises.add(exercise)
+                    // Filtrar apenas os exercícios que não foram feitos
+                    if (!exercise.done) {
+                        exercises.add(exercise)
+                    }
                 }
             }
             .addOnFailureListener { e ->
@@ -102,7 +105,6 @@ fun HomeScreen(navController: NavController) {
         topBar = {
             TopAppBar(
                 modifier = Modifier
-                    //.height(140.dp)
                     .padding(top = 32.dp),
                 title = {
                     Row(
@@ -146,14 +148,11 @@ fun HomeScreen(navController: NavController) {
                     }
                 },
             )
-
         },
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             MuscleFilter(selectedMuscle) { muscle ->
-
-                    selectedMuscle = muscle!!
-
+                selectedMuscle = muscle!!
             }
             Column(Modifier.padding(16.dp)) {
                 Row(
@@ -179,5 +178,4 @@ fun HomeScreen(navController: NavController) {
             }
         }
     }
-
 }

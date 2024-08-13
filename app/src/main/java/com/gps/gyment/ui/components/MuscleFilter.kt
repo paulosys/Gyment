@@ -18,7 +18,7 @@ import com.gps.gyment.data.enums.Muscle
 import com.gps.gyment.ui.theme.GymentTheme
 
 @Composable
-fun MuscleFilter(selectedMuscle: Muscle, onMuscleSelected: (Muscle?) -> Unit) {
+fun MuscleFilter(selectedMuscle: Muscle?, onMuscleSelected: (Muscle?) -> Unit) {
     Row(
         modifier = Modifier
             .horizontalScroll(rememberScrollState())

@@ -103,7 +103,7 @@ fun ExerciseDetailScreen(
                     )
                 )
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Exercise feito!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Exercicio feito!", Toast.LENGTH_SHORT).show()
                     navController.popBackStack()
                     isDone = true
                 }
