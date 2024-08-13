@@ -1,5 +1,6 @@
 package com.gps.gyment.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,20 +25,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.gps.gyment.R
 import com.gps.gyment.data.models.Exercise
-
 @Composable
 fun ExerciseCard(
     exercise: Exercise,
     onClick: () -> Unit
 ) {
-    exercise.imageUrl =
-        "https://assets.clevelandclinic.org/transform/26568096-7fcc-4713-898d-ca1ed6c84895/exerciseHowOften-944015592-770x533-1_jpg"
-
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth()
@@ -52,11 +51,10 @@ fun ExerciseCard(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                AsyncImage(
-                    model = exercise.imageUrl,
+                Image(
+                    painter = painterResource(id = R.drawable.workout),
                     contentDescription = "Imagem do Exercício",
                     contentScale = ContentScale.Crop,
-                    placeholder = ColorPainter(Color.Gray),
                     modifier = Modifier
                         .size(67.dp)
                         .clip(RoundedCornerShape(12.dp))
@@ -83,19 +81,4 @@ fun ExerciseCard(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun ExerciseCardPreview() {
-    val e = Exercise(
-        id = 1,
-        name = "Puxada Frontal",
-        sets = 3,
-        repetitions = 12,
-        imageUrl = "https://assets.clevelandclinic.org/transform/26568096-7fcc-4713-898d-ca1ed6c84895/exerciseHowOften-944015592-770x533-1_jpg",
-        description = null,
-    )
-
-    ExerciseCard(e) {}
 }

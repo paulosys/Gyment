@@ -18,9 +18,7 @@ import com.gps.gyment.data.enums.Muscle
 import com.gps.gyment.ui.theme.GymentTheme
 
 @Composable
-fun MuscleFilter() {
-    var selectedMuscle by remember { mutableStateOf<Muscle?>(Muscle.entries.first()) }
-
+fun MuscleFilter(selectedMuscle: Muscle, onMuscleSelected: (Muscle?) -> Unit) {
     Row(
         modifier = Modifier
             .horizontalScroll(rememberScrollState())
@@ -28,11 +26,12 @@ fun MuscleFilter() {
     ) {
         Muscle.entries.forEach { muscle ->
             MuscleChip(label = muscle.displayName, selected = muscle == selectedMuscle) {
-                selectedMuscle = muscle
+                onMuscleSelected(if (muscle == selectedMuscle) null else muscle)
             }
         }
     }
 }
+
 
 @Composable
 fun MuscleChip(
@@ -46,12 +45,4 @@ fun MuscleChip(
         selected = selected,
         modifier = Modifier.padding(end = 12.dp)
     )
-}
-
-@Preview
-@Composable
-fun MuscleFilterPreview(){
-    GymentTheme {
-        MuscleFilter()
-    }
 }

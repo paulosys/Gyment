@@ -66,7 +66,7 @@ fun CreateExerciseScreen(navController: NavController) {
                 .collection("exercises")
                 .add(exercise)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Exercício criaddo com sucesso", Toast.LENGTH_SHORT)
+                    Toast.makeText(context, "Exercício criado com sucesso", Toast.LENGTH_SHORT)
                         .show()
                     name = ""
                     sets = ""

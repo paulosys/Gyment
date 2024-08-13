@@ -1,5 +1,6 @@
 package com.gps.gyment.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,6 +44,7 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.gps.gyment.R
+import com.gps.gyment.data.enums.Muscle
 import com.gps.gyment.data.models.Exercise
 import com.gps.gyment.ui.components.ExerciseCard
 import com.gps.gyment.ui.components.MuscleFilter
@@ -53,6 +56,8 @@ import com.gps.gyment.ui.theme.GymentTheme
 fun HomeScreen(navController: NavController) {
     val currentUser = FirebaseAuth.getInstance().currentUser
     var userName by remember { mutableStateOf("") }
+    var selectedMuscle by remember { mutableStateOf(Muscle.CHEST) }
+    val exercises = remember { mutableStateListOf<Exercise>() }
 
     // Se o usuário estiver autenticado, buscar o nome do Firestore
     if (currentUser != null) {
@@ -68,34 +73,24 @@ fun HomeScreen(navController: NavController) {
             .addOnFailureListener { e ->
                 e.printStackTrace()
             }
-    }
 
-    val exercises = listOf(
-        Exercise(
-            id = 1,
-            name = "Flexão de Braço",
-            repetitions = 15,
-            sets = 3,
-            imageUrl = "https://assets.clevelandclinic.org/transform/26568096-7fcc-4713-898d-ca1ed6c84895/exerciseHowOften-944015592-770x533-1_jpg",
-            description = "Exercício para trabalhar os músculos do peito, tríceps e ombros."
-        ),
-        Exercise(
-            id = 2,
-            name = "Corrida",
-            repetitions = 3,
-            sets = 15,
-            imageUrl = "https://assets.clevelandclinic.org/transform/26568096-7fcc-4713-898d-ca1ed6c84895/exerciseHowOften-944015592-770x533-1_jpg",
-            description = "Exercício cardiovascular que melhora a resistência e queima calorias."
-        ),
-        Exercise(
-            id = 3,
-            name = "Alongamento",
-            repetitions = 5,
-            sets = 23,
-            imageUrl = "https://assets.clevelandclinic.org/transform/26568096-7fcc-4713-898d-ca1ed6c84895/exerciseHowOften-944015592-770x533-1_jpg",
-            description = "Exercício de flexibilidade para alongar os músculos isquiotibiais."
-        )
-    )
+        // Fetch exercises from Firestore
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(currentUser.uid)
+            .collection("exercises")
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                exercises.clear()
+                for (document in querySnapshot) {
+                    val exercise = document.toObject(Exercise::class.java)
+                    exercises.add(exercise)
+                }
+            }
+            .addOnFailureListener { e ->
+                e.printStackTrace()
+            }
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -154,7 +149,11 @@ fun HomeScreen(navController: NavController) {
         },
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            MuscleFilter()
+            MuscleFilter(selectedMuscle) { muscle ->
+
+                    selectedMuscle = muscle!!
+
+            }
             Column(Modifier.padding(16.dp)) {
                 Row(
                     Modifier
@@ -167,8 +166,7 @@ fun HomeScreen(navController: NavController) {
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                     )
-                    Text(text = "3")
-
+                    Text(text = "${exercises.size}")
                 }
 
                 exercises.forEach { exercise ->

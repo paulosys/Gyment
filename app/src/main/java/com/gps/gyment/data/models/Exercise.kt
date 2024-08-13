@@ -1,10 +1,11 @@
 package com.gps.gyment.data.models
 
 data class Exercise(
-    val id: Int,                  // Identificador único para o exercício
-    val name: String,             // Nome do exercício
-    val repetitions: Int,        // Número de repetições (opcional)
-    val sets: Int,               // Número de séries (opcional)
-    var imageUrl: String,         // ID do recurso da imagem associada ao exercício (opcional)
-    val description: String?      // Descrição do exercício (opcional)
+    val id: Int = 0,                  // Identificador único para o exercício
+    val name: String = "",            // Nome do exercício
+    val repetitions: String = "",     // Número de repetições como String
+    val sets: String = "",            // Número de séries como String
+    val muscleGroup: String = "",     // Grupo muscular relacionado ao exercício
+    val createdAt: Long = 0L,         // Timestamp de criação
+    val done: Boolean = false         // Indica se o exercício foi concluído
 )
